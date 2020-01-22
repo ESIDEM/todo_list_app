@@ -30,7 +30,7 @@ class TodoListState extends State<TodoList> {
       ),
       body: _buildTodoList(),
       floatingActionButton: FloatingActionButton(
-        onPressed: _addTodoItem,
+        onPressed: _pushAddTodoScreen,
         tooltip: "Add Item",
         child: Icon(Icons.add),
       ),
@@ -38,15 +38,13 @@ class TodoListState extends State<TodoList> {
   }
 
   // This will be called each time the + button is pressed
-  void _addTodoItem() {
-    // Putting our code inside "setState" tells the app that our state has changed, and
-    // it will automatically re-render the list
-    setState(() {
-      int index = _todoItems.length;
-      _todoItems.add('Item ' + index.toString());
-    });
+  void _addTodoItem(String task) {
+    if (task.length > 0) {
+      setState(() {
+        _todoItems.add(task);
+      });
+    }
   }
-
   Widget _buildTodoList() {
     return ListView.builder(
       itemBuilder: (context, index) {
@@ -60,5 +58,33 @@ class TodoListState extends State<TodoList> {
   // Build a single todo item
   Widget _buildTodoItem(String todoText) {
     return ListTile(title: Text(todoText));
+  }
+
+  void _pushAddTodoScreen() {
+    // Push this page onto the stack
+    Navigator.of(context).push(
+      // MaterialPageRoute will automatically animate the screen entry, as well
+      // as adding a back button to close it
+        new MaterialPageRoute(
+            builder: (context) {
+              return new Scaffold(
+                  appBar: new AppBar(
+                      title: new Text('Add a new task')
+                  ),
+                  body: new TextField(
+                    autofocus: true,
+                    onSubmitted: (val) {
+                      _addTodoItem(val);
+                      Navigator.pop(context); // Close the add todo screen
+                    },
+                    decoration: new InputDecoration(
+                        hintText: 'Enter something to do...',
+                        contentPadding: const EdgeInsets.all(16.0)
+                    ),
+                  )
+              );
+            }
+        )
+    );
   }
 }
